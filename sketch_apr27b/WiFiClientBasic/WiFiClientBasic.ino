@@ -50,59 +50,61 @@ void setup() {
 void loop() {
   // Recogemos lo que viene de la transmisión LORA
   String payloadfromuno;
-  String lumen;
-  String presionado;
-
-  while(Serial.available() > 0) {
-    //Serial.println("Comienzo a leer");
-    char c = Serial.read();
-    payloadfromuno += c;
-  }
-  Serial.println(payloadfromuno);
-  lumen = payloadfromuno.substring(0,payloadfromuno.indexOf(';'));
-  presionado = payloadfromuno.substring(payloadfromuno.indexOf(';')+1,payloadfromuno.length()-1);
-  Serial.println(lumen);
-  Serial.println(presionado); 
-  String body = "{\"lumen\":" + lumen + ",\"presion\":" + presionado +"}";
-  Serial.println(body);
+  String longitud;
+  String latitud;
+  Serial.println("Veo si hay algo que leer");
+  if (Serial.available () > 0) {
+    while(Serial.available() > 0) {
+      //Serial.println("Comienzo a leer");
+      char c = Serial.read();
+      payloadfromuno += c;
+    }
+    Serial.println(payloadfromuno);
+    longitud = payloadfromuno.substring(0,12);
+    longitud.replace(',','-');
+    latitud = payloadfromuno.substring(13,26);
+    latitud.replace(',','-');
+    Serial.println(longitud);
+    Serial.println(latitud); 
+    String body = "{\"longitud\":\"" + longitud + "\",\"latitud\":\"" + latitud +"\"}";
+    Serial.println(body);
  
-  // Una vez obtenidos los datos habrá que realizar el POST
-  WiFiClient client;
-  String server = "192.168.1.36";
-  // This will send the request to the server
-  if (client.connect(server,9090)) {
-    Serial.println("Conectado");
-    client.print("POST /lora_poc");
-    client.println(" HTTP/1.0");
-    client.println("Host: 192.168.1.36");
-    client.println("Content-Type: application/json");
-    client.println("Accept: application/json");
-    client.print("Content-Length: ");
-    client.println(body.length());
-    client.println();
-    client.print(body);
-  } else {
-    Serial.println("Connection Failed!!!");
-  }
-  while (client.available() == 0) {
-    //Espero respuesta del servidor
-    delay(1000);
-  }
+    // Una vez obtenidos los datos habrá que realizar el POST
+    WiFiClient client;
+    String server = "192.168.1.36";
+    // This will send the request to the server
+    if (client.connect(server,9090)) {
+      Serial.println("Conectado");
+      client.print("POST /lora_poc");
+      client.println(" HTTP/1.0");
+      client.println("Host: 192.168.1.36");
+      client.println("Content-Type: application/json");
+      client.println("Accept: application/json");
+      client.print("Content-Length: ");
+      client.println(body.length());
+      client.println();
+      client.print(body);
+    } else {
+      Serial.println("Connection Failed!!!");
+    }
+    while (client.available() == 0) {
+      //Espero respuesta del servidor
+      delay(1000);
+    }
   
-  String payload ="";
-  if (client.available() > 0) {
-    //Serial.println("Respuesta del servidor");
+    String payload ="";
+    if (client.available() > 0) {
+      //Serial.println("Respuesta del servidor");
       char c;
       while (client.available() > 0) {
         c = client.read();
         payload += c;
-    } 
+      } 
+    }
+
+    Serial.println(payload);
+
+    client.stop();
   }
-
-  Serial.println(payload);
-
-  client.stop();
-
-  //Serial.println("wait 5 sec...");
-  delay(4000);
+  delay(5000);
 }
