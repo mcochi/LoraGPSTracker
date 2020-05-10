@@ -71,13 +71,13 @@ void loop() {
  
     // Una vez obtenidos los datos habrá que realizar el POST
     WiFiClient client;
-    String server = "192.168.1.36";
+    String server = "192.168.1.35";
     // This will send the request to the server
-    if (client.connect(server,9090)) {
+    if (client.connect(server,3002)) {
       Serial.println("Conectado");
-      client.print("POST /lora_poc");
+      client.print("POST /lora_gps");
       client.println(" HTTP/1.0");
-      client.println("Host: 192.168.1.36");
+      client.println("Host: 192.168.1.35");
       client.println("Content-Type: application/json");
       client.println("Accept: application/json");
       client.print("Content-Length: ");
