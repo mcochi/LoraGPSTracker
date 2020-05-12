@@ -34,6 +34,8 @@ void setup()
   if (!manager.init())
     Serial.println("init failed");
   // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on
+
+  driver.setTxPower(20,false);
 }
 
 
